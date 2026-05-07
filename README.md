@@ -36,6 +36,19 @@ cd client
 npm install
 npm run dev
 
+### env server
+# Server Configuration
+NODE_ENV=development
+PORT=5000
+# JWT Secret
+JWT_SECRET=task-react-node-typescript-jwt-Secret
+# MongoDB Configuration
+MONGODB_URI=
+# Encryption keys
+BACKEND_ENCRYPTION_KEY=taskNodeSecretKey123
+
+### Screenshots
+
 ![alt text](image.png)
 ![alt text](image-1.png)
 ![alt text](image-2.png)
