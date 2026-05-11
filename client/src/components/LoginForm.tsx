@@ -32,6 +32,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             if (response.status === 200) {
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('studentId', response.data.studentId);
+                localStorage.setItem('token', response.data.token);
                 onLoginSuccess();
             }
         } catch (err: any) {

@@ -21,7 +21,10 @@ const StudentList: React.FC<StudentListProps> = ({ onEdit, refreshTrigger, onLog
     const fetchStudents = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/students');
+            const token = localStorage.getItem('token');
+            const response = await axios.get('http://localhost:5000/api/students', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
 
             // Final decryption on frontend (remove first encryption layer) - async
             const decryptedStudents = await Promise.all(
@@ -49,8 +52,16 @@ const StudentList: React.FC<StudentListProps> = ({ onEdit, refreshTrigger, onLog
     const handleDelete = async (id: string) => {
         if (window.confirm('Are you sure you want to delete this student?')) {
             try {
-                await axios.delete(`http://localhost:5000/api/student/${id}`);
-                fetchStudents();
+                const token = localStorage.getItem('token');
+                await axios.delete(`http://localhost:5000/api/student/${id}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const loggedInStudentId = localStorage.getItem('studentId');
+                if (id === loggedInStudentId) {
+                    onLogout();
+                } else {
+                    fetchStudents();
+                }
             } catch (err) {
                 setError('Failed to delete student');
                 console.error(err);
@@ -93,9 +104,11 @@ const StudentList: React.FC<StudentListProps> = ({ onEdit, refreshTrigger, onLog
                                     <button className="edit-btn" onClick={() => onEdit(student)}>
                                         Edit
                                     </button>
-                                    <button className="delete-btn" onClick={() => handleDelete(student._id!)}>
-                                        Delete
-                                    </button>
+                                    {student._id !== localStorage.getItem('studentId') && (
+                                        <button className="delete-btn" onClick={() => handleDelete(student._id!)}>
+                                            Delete
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))}

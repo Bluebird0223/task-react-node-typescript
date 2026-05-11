@@ -6,13 +6,14 @@ import {
     deleteStudent,
     login
 } from '../controllers/studentController';
+import { authMiddleware } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
 router.post('/register', createStudent);
 router.post('/login', login);
-router.get('/students', getStudents);
-router.put('/student/:id', updateStudent);
-router.delete('/student/:id', deleteStudent);
+router.get('/students', authMiddleware, getStudents);
+router.put('/student/:id', authMiddleware, updateStudent);
+router.delete('/student/:id', authMiddleware, deleteStudent);
 
 export default router;

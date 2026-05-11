@@ -28,6 +28,7 @@ const App: React.FC = () => {
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('studentId');
+    localStorage.removeItem('token');
     setIsLoggedIn(false);
     setShowForm(false);
     setEditingStudent(null);

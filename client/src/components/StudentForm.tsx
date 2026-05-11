@@ -44,7 +44,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ student, onSuccess, onCancel 
 
         try {
             // Apply first level encryption on frontend (async)
-            const encryptedData = {
+            const encryptedData: any = {
                 fullName: await doubleEncryptForBackend(formData.fullName),
                 email: await doubleEncryptForBackend(formData.email),
                 phoneNumber: await doubleEncryptForBackend(formData.phoneNumber),
@@ -52,12 +52,18 @@ const StudentForm: React.FC<StudentFormProps> = ({ student, onSuccess, onCancel 
                 gender: await doubleEncryptForBackend(formData.gender),
                 address: await doubleEncryptForBackend(formData.address),
                 courseEnrolled: await doubleEncryptForBackend(formData.courseEnrolled),
-                password: await doubleEncryptForBackend(formData.password)
             };
 
+            if (formData.password) {
+                encryptedData.password = await doubleEncryptForBackend(formData.password);
+            }
+
+            const token = localStorage.getItem('token');
             let response;
             if (student?._id) {
-                response = await axios.put(`http://localhost:5000/api/student/${student._id}`, encryptedData);
+                response = await axios.put(`http://localhost:5000/api/student/${student._id}`, encryptedData, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
             } else {
                 response = await axios.post('http://localhost:5000/api/register', encryptedData);
             }
@@ -165,7 +171,8 @@ const StudentForm: React.FC<StudentFormProps> = ({ student, onSuccess, onCancel 
                                     name="password"
                                     value={formData.password}
                                     onChange={handleChange}
-                                    required
+                                    required={!student}
+                                    placeholder={student ? "Leave blank to keep current password" : "Enter password"}
                                     autoComplete="new-password"
                                 />
                             </div>

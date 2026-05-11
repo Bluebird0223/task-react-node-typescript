@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Student, { IStudent } from '../models/Student';
 import { backendDecrypt, backendEncrypt } from '../utils/crypto';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 // Create new student
@@ -18,7 +19,7 @@ export const createStudent = async (req: Request, res: Response) => {
                 return false;
             }
         });
-        
+
         if (existingStudent) {
             return res.status(400).json({ message: 'Student already exists with this email' });
         }
@@ -78,6 +79,24 @@ export const updateStudent = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const updateData = req.body;
+
+        // Check email if already exists
+        if (updateData.email) {
+            const students = await Student.find();
+            const existingStudent = students.find(s => {
+                if (s._id.toString() === id) return false;
+                if (!s.email) return false;
+                try {
+                    return backendDecrypt(s.email) === updateData.email;
+                } catch (e) {
+                    return false;
+                }
+            });
+
+            if (existingStudent) {
+                return res.status(400).json({ message: 'Student already exists with this email' });
+            }
+        }
 
         // Encrypt updated data
         const encryptedUpdate: any = {};
@@ -152,7 +171,13 @@ export const login = async (req: Request, res: Response) => {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        res.status(200).json({ message: 'Login successful', studentId: foundStudent._id });
+        const token = jwt.sign(
+            { id: foundStudent._id },
+            process.env.JWT_SECRET || 'task-react-node-typescript-jwt-Secret',
+            { expiresIn: '24h' }
+        );
+
+        res.status(200).json({ message: 'Login successful', studentId: foundStudent._id, token });
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).json({ message: 'Error during login', error });
