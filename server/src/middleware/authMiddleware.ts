@@ -17,7 +17,6 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
         const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'task-react-node-typescript-jwt-Secret');
 
         // Check if student still exists in the database
-        // This ensures that if the account is deleted, the token becomes invalid immediately
         const studentExists = await Student.findById(decoded.id);
         if (!studentExists) {
             return res.status(401).json({ message: 'Account has been deleted or does not exist.' });
