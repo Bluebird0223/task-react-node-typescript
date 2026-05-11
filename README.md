@@ -29,13 +29,14 @@ Login & Student Registration form with CRUD operations, but with
 cd server
 npm install
 npm run dev
+```
 
 ### Client Setup
 ```bash
 cd client
 npm install
 npm run dev
-
+```
 ### env server
 # Server Configuration
 NODE_ENV=development
